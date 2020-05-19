@@ -1,9 +1,10 @@
 import {Component, OnInit} from '@angular/core';
 import { CasoCovid } from './CasoCovid';
 import { CasoCovidService } from './caso-covid.service';
-import {filtrarPorAno, filtrarPorDepartamento, filtrarPorMes, filtrarPorMunicipio, filtrarPorPais} from './filtros';
+import {filtrarPorAno, filtrarPorDepartamento, filtrarPorEdad, filtrarPorMes, filtrarPorMunicipio, filtrarPorPais} from './filtros';
 import {ChartDataSets, ChartOptions, ChartType} from 'chart.js';
 import {Label} from 'ng2-charts';
+import {FormControl, FormGroup, Validators} from '@angular/forms';
 
 const MESES: string[] = [
   '',
@@ -142,6 +143,32 @@ export class AppComponent implements OnInit {
   porDiaChartData: ChartDataSets[] = [];
   public mostrarChartPorDia = false;
 
+  public formRangoEdad = new FormGroup({
+    edadInicio: new FormControl('', [Validators.required, Validators.pattern('^(120|1[0-1][0-9]|[0-9]?[0-9])$')]),
+    edadFin: new FormControl('', [Validators.required, Validators.pattern('^(120|1[0-1][0-9]|[0-9]?[0-9])$')])
+  });
+
+  public porRangoDeEdad = false;
+  public edadInicio = 0;
+  public edadFin = 120;
+  public porEdadYPais = false;
+  public porEdadYDepto = false;
+  public porEdadYMunicipio = false;
+
+  porEdadChartOptions: ChartOptions = {
+    responsive: true,
+    title: {
+      display: true,
+      text: 'Casos por edad'
+    }
+  };
+  porEdadChartLabels: Label[] = [];
+  porEdadChartType: ChartType = 'bar';
+  porEdadChartLegend = true;
+  porEdadChartPlugins = [];
+  porEdadChartData: ChartDataSets[] = [];
+  public mostrarChartPorEdad = false;
+
   constructor(private casoCovidService: CasoCovidService) { }
 
   ngOnInit(): void {
@@ -150,6 +177,7 @@ export class AppComponent implements OnInit {
       this.crearChartPorPais();
       this.crearChartPorSexo();
       this.crearChartPorAno();
+      this.crearChartPorEdad();
     }, console.error);
   }
 
@@ -177,6 +205,11 @@ export class AppComponent implements OnInit {
           this.mostrarChartPorDia = false;
           this.crearChartPorAno();
         }
+        if (this.porEdadYPais) {
+          this.porEdadYDepto = false;
+          this.porEdadYMunicipio = false;
+          this.crearChartPorEdad();
+        }
       }
     }
   }
@@ -201,6 +234,11 @@ export class AppComponent implements OnInit {
           this.mostrarChartPorMes = false;
           this.mostrarChartPorDia = false;
           this.crearChartPorAno();
+        }
+        if (this.porEdadYDepto) {
+          this.porEdadYDepto = false;
+          this.porEdadYMunicipio = false;
+          this.crearChartPorEdad();
         }
       }
     }
@@ -392,6 +430,29 @@ export class AppComponent implements OnInit {
     this.mostrarChartPorDia = true;
   }
 
+  private crearChartPorEdad(): void {
+    this.porEdadChartLabels = [];
+    const casosPorEdad: number[] = [];
+    let casos = this.casos;
+    if (this.porEdadYPais) {
+      casos = filtrarPorPais(this.casos, this.paisFiltro);
+    }
+    if (this.porEdadYDepto) {
+      casos = filtrarPorDepartamento(casos, this.deptoFiltro);
+    }
+    if (this.porEdadYMunicipio) {
+      casos = filtrarPorMunicipio(casos, this.municipioFiltro);
+    }
+    casos = filtrarPorEdad(casos, this.edadInicio, this.edadFin);
+    const resumen = groupBy(casos, 'edad');
+    for (const prop of Object.keys(resumen)) {
+      this.porEdadChartLabels.push(prop);
+      casosPorEdad.push(resumen[prop].length);
+    }
+    this.porEdadChartData = [{data: casosPorEdad, label: 'Número de casos'}];
+    this.mostrarChartPorEdad = true;
+  }
+
   public onPorSexoYPaisChange(event: any): void {
     this.porSexoYDepto = false;
     this.porSexoYMunicipio = false;
@@ -422,6 +483,41 @@ export class AppComponent implements OnInit {
     this.crearChartPorAno();
   }
 
+  public onSubmitFormRangoEdad(): void {
+    if (!this.formRangoEdad.valid) return;
+
+    const edades = this.formRangoEdad.value;
+
+    if (edades.edadInicio > edades.edadFin) return;
+
+    this.edadInicio = edades.edadInicio;
+    this.edadFin = edades.edadFin;
+
+    this.crearChartPorEdad();
+
+  }
+
+  public onPorEdadYPaisChange($event: any): void {
+    this.porEdadYDepto = false;
+    this.porEdadYMunicipio = false;
+    this.crearChartPorEdad();
+  }
+
+  public onPorEdadYDeptoChange($event: any): void {
+    this.porEdadYMunicipio = false;
+    this.crearChartPorEdad();
+  }
+
+  public onPorEdadYMunicipioChange($event: any): void {
+    this.crearChartPorEdad();
+  }
+
+  public onPorRangoDeEdadChange($event: any): void {
+    this.edadInicio = 0;
+    this.edadFin = 120;
+    this.formRangoEdad.reset({edadInicio: 0, edadFin: 120});
+    this.crearChartPorEdad();
+  }
 }
 
 function groupBy(xs, key) {
