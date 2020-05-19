@@ -126,6 +126,14 @@
         <label class="form-check-label" for="checkPorAnoYMunicipio">Municipio</label>
       </div>
 
+      <nav *ngIf="anoFiltro != null" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item" aria-current="page">{{anoFiltro}}</li>
+          <li *ngIf="mesFiltro != null" class="breadcrumb-item" aria-current="page">{{mesFiltro}}</li>
+          <li *ngIf="diaFiltro != null" class="breadcrumb-item" aria-current="page">{{diaFiltro}}</li>
+        </ol>
+      </nav>
+
       <div class="chart-wrapper">
         <canvas baseChart (chartClick)="onAnoClicked($event)"
                 [datasets]="porAnoChartData"
@@ -137,6 +145,36 @@
         </canvas>
       </div>
 
+    </div>
+
+    <div class="col-12">
+      <div class="row">
+        <div *ngIf="mostrarChartPorMes" class="col-12 col-md-6">
+          <div class="chart-wrapper">
+            <canvas baseChart (chartClick)="onMesClicked($event)"
+                    [datasets]="porMesChartData"
+                    [labels]="porMesChartLabels"
+                    [options]="porMesChartOptions"
+                    [plugins]="porMesChartPlugins"
+                    [legend]="porMesChartLegend"
+                    [chartType]="porMesChartType">
+            </canvas>
+          </div>
+        </div>
+
+        <div *ngIf="mostrarChartPorDia" class="col-12 col-md-6">
+          <div class="chart-wrapper">
+            <canvas baseChart (chartClick)="onDiaClicked($event)"
+                    [datasets]="porDiaChartData"
+                    [labels]="porDiaChartLabels"
+                    [options]="porDiaChartOptions"
+                    [plugins]="porDiaChartPlugins"
+                    [legend]="porDiaChartLegend"
+                    [chartType]="porDiaChartType">
+            </canvas>
+          </div>
+        </div>
+      </div>
     </div>
 
   </div>

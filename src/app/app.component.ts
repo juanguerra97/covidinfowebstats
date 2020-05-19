@@ -1,9 +1,25 @@
 import {Component, OnInit} from '@angular/core';
 import { CasoCovid } from './CasoCovid';
 import { CasoCovidService } from './caso-covid.service';
-import {filtrarPorDepartamento, filtrarPorMunicipio, filtrarPorPais} from './filtros';
+import {filtrarPorAno, filtrarPorDepartamento, filtrarPorMes, filtrarPorMunicipio, filtrarPorPais} from './filtros';
 import {ChartDataSets, ChartOptions, ChartType} from 'chart.js';
 import {Label} from 'ng2-charts';
+
+const MESES: string[] = [
+  '',
+  'Enero',
+  'Febrero',
+  'Marzo',
+  'Abril',
+  'Mayo',
+  'Junio',
+  'Julio',
+  'Agosto',
+  'Septiembre',
+  'Octubre',
+  'Noviembre',
+  'Diciembre'
+];
 
 @Component({
   selector: 'app-root',
@@ -98,6 +114,34 @@ export class AppComponent implements OnInit {
   porAnoChartData: ChartDataSets[] = [];
   public mostrarChartPorAno = false;
 
+  porMesChartOptions: ChartOptions = {
+    responsive: true,
+    title: {
+      display: true,
+      text: 'Casos por mes'
+    }
+  };
+  porMesChartLabels: Label[] = [];
+  porMesChartType: ChartType = 'pie';
+  porMesChartLegend = true;
+  porMesChartPlugins = [];
+  porMesChartData: ChartDataSets[] = [];
+  public mostrarChartPorMes = false;
+
+  porDiaChartOptions: ChartOptions = {
+    responsive: true,
+    title: {
+      display: true,
+      text: 'Casos por dia'
+    }
+  };
+  porDiaChartLabels: Label[] = [];
+  porDiaChartType: ChartType = 'line';
+  porDiaChartLegend = true;
+  porDiaChartPlugins = [];
+  porDiaChartData: ChartDataSets[] = [];
+  public mostrarChartPorDia = false;
+
   constructor(private casoCovidService: CasoCovidService) { }
 
   ngOnInit(): void {
@@ -123,6 +167,16 @@ export class AppComponent implements OnInit {
           this.porSexoYMunicipio = false;
           this.crearChartPorSexo();
         }
+        if (this.porAnoYPais) {
+          this.porAnoYDepto = false;
+          this.porAnoYMunicipio = false;
+          this.anoFiltro = null;
+          this.mesFiltro = null;
+          this.diaFiltro = null;
+          this.mostrarChartPorMes = false;
+          this.mostrarChartPorDia = false;
+          this.crearChartPorAno();
+        }
       }
     }
   }
@@ -138,6 +192,16 @@ export class AppComponent implements OnInit {
           this.porSexoYMunicipio = false;
           this.crearChartPorSexo();
         }
+        if (this.porAnoYDepto) {
+          this.porAnoYDepto = false;
+          this.porAnoYMunicipio = false;
+          this.anoFiltro = null;
+          this.mesFiltro = null;
+          this.diaFiltro = null;
+          this.mostrarChartPorMes = false;
+          this.mostrarChartPorDia = false;
+          this.crearChartPorAno();
+        }
       }
     }
   }
@@ -150,6 +214,16 @@ export class AppComponent implements OnInit {
         if (this.porSexoYMunicipio) {
           this.crearChartPorSexo();
         }
+        if (this.porAnoYMunicipio) {
+          this.porAnoYDepto = false;
+          this.porAnoYMunicipio = false;
+          this.anoFiltro = null;
+          this.mesFiltro = null;
+          this.diaFiltro = null;
+          this.mostrarChartPorMes = false;
+          this.mostrarChartPorDia = false;
+          this.crearChartPorAno();
+        }
       }
     }
   }
@@ -161,7 +235,29 @@ export class AppComponent implements OnInit {
         this.anoFiltro = ano;
         this.mesFiltro = null;
         this.diaFiltro = null;
+        this.mostrarChartPorDia = false;
         this.crearChartPorAno();
+        this.crearChartPorMes();
+      }
+    }
+  }
+
+  public onMesClicked($event: { event?: MouseEvent; active?: { _index?: number }[] }): void {
+    if ($event.active.length > 0) {
+      const mes = this.porMesChartLabels[$event.active[0]._index].toString();
+      if (mes !== this.mesFiltro) {
+        this.mesFiltro = mes;
+        this.diaFiltro = null;
+        this.crearChartPorDia();
+      }
+    }
+  }
+
+  public onDiaClicked($event: { event?: MouseEvent; active?: { _index?: number }[] }): void {
+    if ($event.active.length > 0) {
+      const dia = this.porDiaChartLabels[$event.active[0]._index].toString();
+      if (dia !== this.diaFiltro) {
+        this.diaFiltro = dia;
       }
     }
   }
@@ -249,6 +345,53 @@ export class AppComponent implements OnInit {
     this.mostrarChartPorAno = true;
   }
 
+  private crearChartPorMes(): void {
+    this.porMesChartLabels = [];
+    const casosPorMes: number[] = [];
+    let casos = this.casos;
+    if (this.porAnoYPais) {
+      casos = filtrarPorPais(this.casos, this.paisFiltro);
+    }
+    if (this.porAnoYDepto) {
+      casos = filtrarPorDepartamento(casos, this.deptoFiltro);
+    }
+    if (this.porAnoYMunicipio) {
+      casos = filtrarPorMunicipio(casos, this.municipioFiltro);
+    }
+    casos = filtrarPorAno(casos, this.anoFiltro);
+    const resumen = groupByMes(casos, 'fecha');
+    for (const prop of Object.keys(resumen)) {
+      this.porMesChartLabels.push(prop);
+      casosPorMes.push(resumen[prop].length);
+    }
+    this.porMesChartData = [{data: casosPorMes, label: 'Casos por mes'}];
+    this.mostrarChartPorMes = true;
+  }
+
+  private crearChartPorDia(): void {
+    this.porDiaChartLabels = [];
+    const casosPorDia: number[] = [];
+    let casos = this.casos;
+    if (this.porAnoYPais) {
+      casos = filtrarPorPais(this.casos, this.paisFiltro);
+    }
+    if (this.porAnoYDepto) {
+      casos = filtrarPorDepartamento(casos, this.deptoFiltro);
+    }
+    if (this.porAnoYMunicipio) {
+      casos = filtrarPorMunicipio(casos, this.municipioFiltro);
+    }
+    casos = filtrarPorAno(casos, this.anoFiltro);
+    casos = filtrarPorMes(casos, this.mesFiltro);
+    const resumen = groupByDia(casos, 'fecha');
+    for (const prop of Object.keys(resumen)) {
+      this.porDiaChartLabels.push(prop);
+      casosPorDia.push(resumen[prop].length);
+    }
+    this.porDiaChartData = [{data: casosPorDia, label: 'Número de casos'}];
+    this.mostrarChartPorDia = true;
+  }
+
   public onPorSexoYPaisChange(event: any): void {
     this.porSexoYDepto = false;
     this.porSexoYMunicipio = false;
@@ -278,6 +421,7 @@ export class AppComponent implements OnInit {
   public onPorAnoYMunicipioChange($event: any): void {
     this.crearChartPorAno();
   }
+
 }
 
 function groupBy(xs, key) {
@@ -290,6 +434,20 @@ function groupBy(xs, key) {
 function groupByAno(xs, keyFecha) {
   return xs.reduce((rv, x) => {
     (rv[x[keyFecha].substring(0, 4)] = rv[x[keyFecha].substring(0, 4)] || []).push(x);
+    return rv;
+  }, {});
+}
+
+function groupByMes(xs, keyFecha) {
+  return xs.reduce((rv, x) => {
+    (rv[x[keyFecha].substring(5, 7)] = rv[x[keyFecha].substring(5, 7)] || []).push(x);
+    return rv;
+  }, {});
+}
+
+function groupByDia(xs, keyFecha) {
+  return xs.reduce((rv, x) => {
+    (rv[x[keyFecha].substring(8, 10) * 1] = rv[x[keyFecha].substring(8, 10) * 1] || []).push(x);
     return rv;
   }, {});
 }
