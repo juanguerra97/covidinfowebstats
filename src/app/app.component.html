@@ -65,25 +65,17 @@
 
     <div *ngIf="mostrarChartPorSexo" class="col">
 
-      <nav *ngIf="paisFiltro != null && porSexoYPais" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item" aria-current="page">{{paisFiltro}}</li>
-          <li *ngIf="deptoFiltro != null && porSexoYDepto" class="breadcrumb-item" aria-current="page">{{deptoFiltro}}</li>
-          <li *ngIf="municipioFiltro != null && porSexoYMunicipio" class="breadcrumb-item" aria-current="page">{{municipioFiltro}}</li>
-        </ol>
-      </nav>
-
         <div class="form-check form-check-inline">
           <input [disabled]="paisFiltro == null" [(ngModel)]="porSexoYPais" [ngModelOptions]="{standalone: true}" (ngModelChange)="onPorSexoYPaisChange($event)" ngDefaultControl class="form-check-input" name="porSexoYPais" type="checkbox" id="checkPorSexoYPais">
-          <label class="form-check-label" for="checkPorSexoYPais">Pais</label>
+          <label class="form-check-label" for="checkPorSexoYPais">Pais {{ paisFiltro != null ? '(' + paisFiltro + ')' : '' }}</label>
         </div>
         <div class="form-check form-check-inline">
           <input [disabled]="!porSexoYPais || deptoFiltro == null" [(ngModel)]="porSexoYDepto" [ngModelOptions]="{standalone: true}" (ngModelChange)="onPorSexoYDeptoChange($event)" ngDefaultControl  class="form-check-input" type="checkbox" name="porSexoYDepto" id="checkPorSexoYDepto">
-          <label class="form-check-label" for="checkPorSexoYDepto">Departamento</label>
+          <label class="form-check-label" for="checkPorSexoYDepto">Departamento {{ deptoFiltro != null ? '(' + deptoFiltro + ')' : '' }}</label>
         </div>
         <div class="form-check form-check-inline">
           <input [disabled]="!porSexoYDepto || municipioFiltro == null" [(ngModel)]="porSexoYMunicipio" [ngModelOptions]="{standalone: true}" (ngModelChange)="onPorSexoYMunicipioChange($event)" ngDefaultControl class="form-check-input" type="checkbox" name="porSexoYMunicipio" id="checkPorSexoYMunicipio">
-          <label class="form-check-label" for="checkPorSexoYMunicipio">Municipio</label>
+          <label class="form-check-label" for="checkPorSexoYMunicipio">Municipio {{ municipioFiltro != null ? '(' + municipioFiltro + ')' : '' }}</label>
         </div>
 
       <div class="chart-wrapper">
@@ -105,27 +97,6 @@
 
     <div *ngIf="mostrarChartPorAno" class="col">
 
-      <nav *ngIf="paisFiltro != null && porAnoYPais" aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item" aria-current="page">{{paisFiltro}}</li>
-          <li *ngIf="deptoFiltro != null && porAnoYDepto" class="breadcrumb-item" aria-current="page">{{deptoFiltro}}</li>
-          <li *ngIf="municipioFiltro != null && porAnoYMunicipio" class="breadcrumb-item" aria-current="page">{{municipioFiltro}}</li>
-        </ol>
-      </nav>
-
-      <div class="form-check form-check-inline">
-        <input [disabled]="paisFiltro == null" [(ngModel)]="porAnoYPais" [ngModelOptions]="{standalone: true}" (ngModelChange)="onPorAnoYPaisChange($event)" ngDefaultControl class="form-check-input" name="porAnoYPais" type="checkbox" id="checkPorAnoYPais">
-        <label class="form-check-label" for="checkPorAnoYPais">Pais</label>
-      </div>
-      <div class="form-check form-check-inline">
-        <input [disabled]="!porAnoYPais || deptoFiltro == null" [(ngModel)]="porAnoYDepto" [ngModelOptions]="{standalone: true}" (ngModelChange)="onPorAnoYDeptoChange($event)" ngDefaultControl  class="form-check-input" type="checkbox" name="porAnoYDepto" id="checkPorAnoYDepto">
-        <label class="form-check-label" for="checkPorAnoYDepto">Departamento</label>
-      </div>
-      <div class="form-check form-check-inline">
-        <input [disabled]="!porAnoYDepto || municipioFiltro == null" [(ngModel)]="porAnoYMunicipio" [ngModelOptions]="{standalone: true}" (ngModelChange)="onPorAnoYMunicipioChange($event)" ngDefaultControl class="form-check-input" type="checkbox" name="porAnoYMunicipio" id="checkPorAnoYMunicipio">
-        <label class="form-check-label" for="checkPorAnoYMunicipio">Municipio</label>
-      </div>
-
       <nav *ngIf="anoFiltro != null" aria-label="breadcrumb">
         <ol class="breadcrumb">
           <li class="breadcrumb-item" aria-current="page">{{anoFiltro}}</li>
@@ -133,6 +104,20 @@
           <li *ngIf="diaFiltro != null" class="breadcrumb-item" aria-current="page">{{diaFiltro}}</li>
         </ol>
       </nav>
+
+
+      <div class="form-check form-check-inline">
+        <input [disabled]="paisFiltro == null" [(ngModel)]="porAnoYPais" [ngModelOptions]="{standalone: true}" (ngModelChange)="onPorAnoYPaisChange($event)" ngDefaultControl class="form-check-input" name="porAnoYPais" type="checkbox" id="checkPorAnoYPais">
+        <label class="form-check-label" for="checkPorAnoYPais">Pais {{ paisFiltro != null ? '(' + paisFiltro + ')' : '' }}</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input [disabled]="!porAnoYPais || deptoFiltro == null" [(ngModel)]="porAnoYDepto" [ngModelOptions]="{standalone: true}" (ngModelChange)="onPorAnoYDeptoChange($event)" ngDefaultControl  class="form-check-input" type="checkbox" name="porAnoYDepto" id="checkPorAnoYDepto">
+        <label class="form-check-label" for="checkPorAnoYDepto">Departamento {{ deptoFiltro != null ? '(' + deptoFiltro + ')' : '' }}</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input [disabled]="!porAnoYDepto || municipioFiltro == null" [(ngModel)]="porAnoYMunicipio" [ngModelOptions]="{standalone: true}" (ngModelChange)="onPorAnoYMunicipioChange($event)" ngDefaultControl class="form-check-input" type="checkbox" name="porAnoYMunicipio" id="checkPorAnoYMunicipio">
+        <label class="form-check-label" for="checkPorAnoYMunicipio">Municipio {{ municipioFiltro != null ? '(' + municipioFiltro + ')' : '' }}</label>
+      </div>
 
       <div class="chart-wrapper">
         <canvas baseChart (chartClick)="onAnoClicked($event)"
