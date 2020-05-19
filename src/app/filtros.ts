@@ -24,6 +24,18 @@ export function filtrarPorFecha(casos: CasoCovid[], fecha: string): CasoCovid[] 
   return casos.filter(c => c.fecha === fecha);
 }
 
+export function filtrarPorAno(casos: CasoCovid[], ano: string): CasoCovid[] {
+  return casos.filter(c => c.fecha.substring(0, 4) === ano);
+}
+
+export function filtrarPorMes(casos: CasoCovid[], mes: string): CasoCovid[] {
+  return casos.filter(c => c.fecha.substring(5, 7) === mes);
+}
+
+export function filtrarPorDia(casos: CasoCovid[], dia: string): CasoCovid[] {
+  return casos.filter(c => c.fecha.substring(8, 10) === dia);
+}
+
 export function filtrarCasos(casos: CasoCovid[], pais: string,
                              departamento: string, municipio: string, sexo: string,
                              fecha: string, edad: number, edadFin: number = edad): CasoCovid[] {
