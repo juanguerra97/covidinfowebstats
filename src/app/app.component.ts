@@ -16,6 +16,9 @@ export class AppComponent implements OnInit {
   public paisFiltro: string = null;
   public deptoFiltro: string = null;
   public municipioFiltro: string = null;
+  public anoFiltro: string = null;
+  public mesFiltro: string = null;
+  public diaFiltro: string = null;
 
   porPaisChartOptions: ChartOptions = {
     responsive: true,
@@ -77,6 +80,24 @@ export class AppComponent implements OnInit {
   porSexoChartData: ChartDataSets[] = [];
   public mostrarChartPorSexo = false;
 
+  public porAnoYPais = false;
+  public porAnoYDepto = false;
+  public porAnoYMunicipio = false;
+
+  porAnoChartOptions: ChartOptions = {
+    responsive: true,
+    title: {
+      display: true,
+      text: 'Casos por año'
+    }
+  };
+  porAnoChartLabels: Label[] = [];
+  porAnoChartType: ChartType = 'pie';
+  porAnoChartLegend = true;
+  porAnoChartPlugins = [];
+  porAnoChartData: ChartDataSets[] = [];
+  public mostrarChartPorAno = false;
+
   constructor(private casoCovidService: CasoCovidService) { }
 
   ngOnInit(): void {
@@ -84,6 +105,7 @@ export class AppComponent implements OnInit {
       this.casos = res.registros;
       this.crearChartPorPais();
       this.crearChartPorSexo();
+      this.crearChartPorAno();
     }, console.error);
   }
 
@@ -128,6 +150,18 @@ export class AppComponent implements OnInit {
         if (this.porSexoYMunicipio) {
           this.crearChartPorSexo();
         }
+      }
+    }
+  }
+
+  public onAnoClicked(event: any): void {
+    if (event.active.length > 0) {
+      const ano = this.porAnoChartLabels[event.active[0]._index].toString();
+      if (ano !== this.anoFiltro) {
+        this.anoFiltro = ano;
+        this.mesFiltro = null;
+        this.diaFiltro = null;
+        this.crearChartPorAno();
       }
     }
   }
@@ -193,6 +227,28 @@ export class AppComponent implements OnInit {
     this.mostrarChartPorSexo = true;
   }
 
+  private crearChartPorAno(): void {
+    this.porAnoChartLabels = [];
+    const casosPorAno: number[] = [];
+    let casos = this.casos;
+    if (this.porAnoYPais) {
+      casos = filtrarPorPais(this.casos, this.paisFiltro);
+    }
+    if (this.porAnoYDepto) {
+      casos = filtrarPorDepartamento(casos, this.deptoFiltro);
+    }
+    if (this.porAnoYMunicipio) {
+      casos = filtrarPorMunicipio(casos, this.municipioFiltro);
+    }
+    const resumen = groupByAno(casos, 'fecha');
+    for (const prop of Object.keys(resumen)) {
+      this.porAnoChartLabels.push(prop);
+      casosPorAno.push(resumen[prop].length);
+    }
+    this.porAnoChartData = [{data: casosPorAno, label: 'Casos por año'}];
+    this.mostrarChartPorAno = true;
+  }
+
   public onPorSexoYPaisChange(event: any): void {
     this.porSexoYDepto = false;
     this.porSexoYMunicipio = false;
@@ -208,10 +264,20 @@ export class AppComponent implements OnInit {
     this.crearChartPorSexo();
   }
 
-  public print(obj: any): void {
-    console.log(obj);
+  public onPorAnoYPaisChange(event: any): void {
+    this.porAnoYDepto = false;
+    this.porAnoYMunicipio = false;
+    this.crearChartPorAno();
   }
 
+  public onPorAnoYDeptoChange(event: any): void {
+    this.porAnoYMunicipio = false;
+    this.crearChartPorAno();
+  }
+
+  public onPorAnoYMunicipioChange($event: any): void {
+    this.crearChartPorAno();
+  }
 }
 
 function groupBy(xs, key) {
@@ -219,4 +285,11 @@ function groupBy(xs, key) {
     (rv[x[key]] = rv[x[key]] || []).push(x);
     return rv;
   }, {});
-};
+}
+
+function groupByAno(xs, keyFecha) {
+  return xs.reduce((rv, x) => {
+    (rv[x[keyFecha].substring(0, 4)] = rv[x[keyFecha].substring(0, 4)] || []).push(x);
+    return rv;
+  }, {});
+}
