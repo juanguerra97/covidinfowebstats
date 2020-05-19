@@ -73,8 +73,10 @@ export class AppComponent implements OnInit {
       const pais = this.porPaisChartLabels[event.active[0]._index].toString();
       if (pais !== this.paisFiltro) {
         this.paisFiltro = pais;
-        this.crearChartPorDepartamento();
+        this.deptoFiltro = null;
+        this.municipioFiltro = null;
         this.mostrarChartPorMunicipio = false;
+        this.crearChartPorDepartamento();
       }
     }
   }
@@ -84,6 +86,7 @@ export class AppComponent implements OnInit {
       const depto = this.porDepartamentoChartLabels[event.active[0]._index].toString();
       if (depto !== this.deptoFiltro) {
         this.deptoFiltro = depto;
+        this.municipioFiltro = null;
         this.crearChartPorMunicipio();
       }
     }
@@ -92,7 +95,7 @@ export class AppComponent implements OnInit {
   public onMunicipioClicked(event: any): void {
     if (event.active.length > 0) {
       const municipio = this.porMunicipioChartLabels[event.active[0]._index].toString();
-      if (municipio !== this.deptoFiltro) {
+      if (municipio !== this.municipioFiltro) {
         this.municipioFiltro = municipio;
       }
     }

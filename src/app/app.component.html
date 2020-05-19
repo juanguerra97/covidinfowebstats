@@ -3,6 +3,16 @@
 <div class="container-fluid">
 
   <div class="row">
+    <nav *ngIf="paisFiltro != null" aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item" aria-current="page">{{paisFiltro}}</li>
+        <li *ngIf="deptoFiltro != null" class="breadcrumb-item" aria-current="page">{{deptoFiltro}}</li>
+        <li *ngIf="municipioFiltro != null" class="breadcrumb-item" aria-current="page">{{municipioFiltro}}</li>
+      </ol>
+    </nav>
+  </div>
+
+  <div class="row">
     <div class="col">
       <div *ngIf="mostrarChartPorPais" class="chart-wrapper">
         <canvas baseChart (chartClick)="onPaisClicked($event)"
