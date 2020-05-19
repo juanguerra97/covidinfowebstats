@@ -2,7 +2,7 @@
 
 <div class="container-fluid">
 
-  <div *ngIf="paisFiltro != null" class="row">
+  <div *ngIf="paisFiltro != null">
     <div class="col">
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -16,7 +16,7 @@
 
   <div class="row">
     <div class="col">
-      <div *ngIf="mostrarChartPorPais" class="chart-wrapper">
+      <div *ngIf="mostrarChartPorPais" class="chart-wrapper animate__animated animate__fadeIn">
         <canvas baseChart (chartClick)="onPaisClicked($event)"
                 [datasets]="porPaisChartData"
                 [labels]="porPaisChartLabels"
@@ -32,7 +32,7 @@
   <div class="row">
 
     <div class="col-12 col-lg-6">
-      <div *ngIf="mostrarChartPorDepartamento" class="chart-wrapper">
+      <div *ngIf="mostrarChartPorDepartamento" class="chart-wrapper animate__animated animate__bounceInLeft">
         <canvas baseChart (chartClick)="onDeptoClicked($event)"
                 [datasets]="porDepartamentoChartData"
                 [labels]="porDepartamentoChartLabels"
@@ -45,7 +45,7 @@
     </div>
 
     <div class="col-12 col-lg-6">
-      <div *ngIf="mostrarChartPorMunicipio" class="chart-wrapper">
+      <div *ngIf="mostrarChartPorMunicipio" class="chart-wrapper animate__animated animate__bounceInRight">
         <canvas baseChart (chartClick)="onMunicipioClicked($event)"
                 [datasets]="porMunicipioChartData"
                 [labels]="porMunicipioChartLabels"
@@ -63,7 +63,7 @@
 
   <div class="row">
 
-    <div *ngIf="mostrarChartPorSexo" class="col">
+    <div *ngIf="mostrarChartPorSexo" class="col animate__animated animate__fadeIn">
 
         <div class="form-check form-check-inline">
           <input [disabled]="paisFiltro == null" [(ngModel)]="porSexoYPais" [ngModelOptions]="{standalone: true}" (ngModelChange)="onPorSexoYPaisChange($event)" ngDefaultControl class="form-check-input" name="porSexoYPais" type="checkbox" id="checkPorSexoYPais">
@@ -95,7 +95,7 @@
 
   <div class="row">
 
-    <div *ngIf="mostrarChartPorAno" class="col">
+    <div *ngIf="mostrarChartPorAno" class="col animate__animated animate__fadeIn">
 
       <nav *ngIf="anoFiltro != null" aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -134,7 +134,7 @@
 
     <div class="col-12">
       <div class="row">
-        <div *ngIf="mostrarChartPorMes" class="col-12 col-md-6">
+        <div *ngIf="mostrarChartPorMes" class="col-12 col-md-6 animate__animated animate__bounceInLeft">
           <div class="chart-wrapper">
             <canvas baseChart (chartClick)="onMesClicked($event)"
                     [datasets]="porMesChartData"
@@ -147,7 +147,7 @@
           </div>
         </div>
 
-        <div *ngIf="mostrarChartPorDia" class="col-12 col-md-6">
+        <div *ngIf="mostrarChartPorDia" class="col-12 col-md-6 animate__animated animate__bounceInRight">
           <div class="chart-wrapper">
             <canvas baseChart (chartClick)="onDiaClicked($event)"
                     [datasets]="porDiaChartData"
