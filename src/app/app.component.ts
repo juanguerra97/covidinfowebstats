@@ -59,12 +59,31 @@ export class AppComponent implements OnInit {
   porMunicipioChartData: ChartDataSets[] = [];
   public mostrarChartPorMunicipio = false;
 
+  public porSexoYPais = false;
+  public porSexoYDepto = false;
+  public porSexoYMunicipio = false;
+
+  porSexoChartOptions: ChartOptions = {
+    responsive: true,
+    title: {
+      display: true,
+      text: 'Casos por sexo'
+    }
+  };
+  porSexoChartLabels: Label[] = [];
+  porSexoChartType: ChartType = 'pie';
+  porSexoChartLegend = true;
+  porSexoChartPlugins = [];
+  porSexoChartData: ChartDataSets[] = [];
+  public mostrarChartPorSexo = false;
+
   constructor(private casoCovidService: CasoCovidService) { }
 
   ngOnInit(): void {
     this.casoCovidService.getAll().subscribe((res: any) => {
       this.casos = res.registros;
       this.crearChartPorPais();
+      this.crearChartPorSexo();
     }, console.error);
   }
 
@@ -77,6 +96,11 @@ export class AppComponent implements OnInit {
         this.municipioFiltro = null;
         this.mostrarChartPorMunicipio = false;
         this.crearChartPorDepartamento();
+        if (this.porSexoYPais) {
+          this.porSexoYDepto = false;
+          this.porSexoYMunicipio = false;
+          this.crearChartPorSexo();
+        }
       }
     }
   }
@@ -88,6 +112,10 @@ export class AppComponent implements OnInit {
         this.deptoFiltro = depto;
         this.municipioFiltro = null;
         this.crearChartPorMunicipio();
+        if (this.porSexoYDepto) {
+          this.porSexoYMunicipio = false;
+          this.crearChartPorSexo();
+        }
       }
     }
   }
@@ -97,6 +125,9 @@ export class AppComponent implements OnInit {
       const municipio = this.porMunicipioChartLabels[event.active[0]._index].toString();
       if (municipio !== this.municipioFiltro) {
         this.municipioFiltro = municipio;
+        if (this.porSexoYMunicipio) {
+          this.crearChartPorSexo();
+        }
       }
     }
   }
@@ -138,6 +169,43 @@ export class AppComponent implements OnInit {
     }
     this.porMunicipioChartData = [{data: casosPorMunicipio, label: 'Casos por municipio'}];
     this.mostrarChartPorMunicipio = true;
+  }
+
+  private crearChartPorSexo(): void {
+    this.porSexoChartLabels = [];
+    const casosPorSexo: number[] = [];
+    let casos = this.casos;
+    if (this.porSexoYPais) {
+      casos = filtrarPorPais(this.casos, this.paisFiltro);
+    }
+    if (this.porSexoYDepto) {
+      casos = filtrarPorDepartamento(casos, this.deptoFiltro);
+    }
+    if (this.porSexoYMunicipio) {
+      casos = filtrarPorMunicipio(casos, this.municipioFiltro);
+    }
+    const resumen = groupBy(casos, 'sexo');
+    for (const prop of Object.keys(resumen)) {
+      this.porSexoChartLabels.push(prop);
+      casosPorSexo.push(resumen[prop].length);
+    }
+    this.porSexoChartData = [{data: casosPorSexo, label: 'Casos por sexo'}];
+    this.mostrarChartPorSexo = true;
+  }
+
+  public onPorSexoYPaisChange(event: any): void {
+    this.porSexoYDepto = false;
+    this.porSexoYMunicipio = false;
+    this.crearChartPorSexo();
+  }
+
+  public onPorSexoYDeptoChange(event: any): void {
+    this.porSexoYMunicipio = false;
+    this.crearChartPorSexo();
+  }
+
+  public onPorSexoYMunicipioChange(event: any): void {
+    this.crearChartPorSexo();
   }
 
   public print(obj: any): void {
