@@ -1,2 +1,52 @@
 
+
+<div class="container-fluid">
+
+  <div class="row">
+    <div class="col">
+      <div *ngIf="mostrarChartPorPais" class="chart-wrapper">
+        <canvas baseChart (chartClick)="onPaisClicked($event)"
+                [datasets]="porPaisChartData"
+                [labels]="porPaisChartLabels"
+                [options]="porPaisChartOptions"
+                [plugins]="porPaisChartPlugins"
+                [legend]="porPaisChartLegend"
+                [chartType]="porPaisChartType">
+        </canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+
+    <div class="col-12 col-lg-6">
+      <div *ngIf="mostrarChartPorDepartamento" class="chart-wrapper">
+        <canvas baseChart (chartClick)="onDeptoClicked($event)"
+                [datasets]="porDepartamentoChartData"
+                [labels]="porDepartamentoChartLabels"
+                [options]="porDepartamentoChartOptions"
+                [plugins]="porDepartamentoChartPlugins"
+                [legend]="porDepartamentoChartLegend"
+                [chartType]="porDepartamentoChartType">
+        </canvas>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-6">
+      <div *ngIf="mostrarChartPorMunicipio" class="chart-wrapper">
+        <canvas baseChart (chartClick)="onMunicipioClicked($event)"
+                [datasets]="porMunicipioChartData"
+                [labels]="porMunicipioChartLabels"
+                [options]="porMunicipioChartOptions"
+                [plugins]="porMunicipioChartPlugins"
+                [legend]="porMunicipioChartLegend"
+                [chartType]="porMunicipioChartType">
+        </canvas>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
 <router-outlet></router-outlet>
